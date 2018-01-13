@@ -44,6 +44,7 @@ classdef WaterDetector < handle
                 I(:,:,1) = adapthisteq(obj.image(:,:,1));
                 I(:,:,2) = adapthisteq(obj.image(:,:,2));
                 I(:,:,3) = adapthisteq(obj.image(:,:,3));
+                
             end
         end
         
