@@ -50,7 +50,7 @@ classdef WaterDetector < handle
         
         function crop = getCrop(obj)
             crop = obj.crop;
-            if (obj.histeq)
+            if (~obj.histeq)
                 crop.iamge(:,:,1) = adapthisteq(obj.image(:,:,1));
                 crop.iamge(:,:,2) = adapthisteq(obj.image(:,:,2));
                 crop.iamge(:,:,3) = adapthisteq(obj.image(:,:,3));
