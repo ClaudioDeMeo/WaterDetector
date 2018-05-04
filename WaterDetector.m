@@ -51,9 +51,9 @@ classdef WaterDetector < handle
         function crop = getCrop(obj)
             crop = obj.crop;
             if (~obj.histeq && ~isempty(obj.crop.image))
-                crop.image(:,:,1) = adapthisteq(obj.image(:,:,1));
-                crop.image(:,:,2) = adapthisteq(obj.image(:,:,2));
-                crop.image(:,:,3) = adapthisteq(obj.image(:,:,3));
+                crop.image(:,:,1) = adapthisteq(obj.crop.image(:,:,1));
+                crop.image(:,:,2) = adapthisteq(obj.crop.image(:,:,2));
+                crop.image(:,:,3) = adapthisteq(obj.crop.image(:,:,3));
             end
         end
         
@@ -122,12 +122,13 @@ classdef WaterDetector < handle
         function crop = cropImage(obj)
             if (~isempty(obj.image))
                 if (isempty(obj.mask))
-                    [~, obj.crop.rect] = imcrop(obj.image(:,:,1:3));
+                    [~, obj.crop.rect] = imcrop(obj.getImage());
                     close;
                 else
-                    r = obj.image(:,:,1);
-                    g = obj.image(:,:,2);
-                    b = obj.image(:,:,3);
+                    I=obj.getImage();
+                    r = I(:,:,1);
+                    g = I(:,:,2);
+                    b = I(:,:,3);
                     r(obj.mask) = 0;
                     g(obj.mask) = 0;
                     b(obj.mask) = 65535;
