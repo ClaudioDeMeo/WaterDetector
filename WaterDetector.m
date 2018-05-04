@@ -222,17 +222,19 @@ classdef WaterDetector < handle
             image = [];
             if (~isempty(obj.mask))
                 if (isempty(obj.crop.image))
-                    r = obj.image(:,:,1);
-                    g = obj.image(:,:,2);
-                    b = obj.image(:,:,3);
+                    I = obj.getImage();
+                    r = I(:,:,1);
+                    g = I(:,:,2);
+                    b = I(:,:,3);
                     r(obj.mask) = 0;
                     g(obj.mask) = 0;
                     b(obj.mask) = 65535;
                     image = cat(3,r,g,b);
                 else
-                    r = obj.crop.image(:,:,1);
-                    g = obj.crop.image(:,:,2);
-                    b = obj.crop.image(:,:,3);
+                    I = obj.getCrop().image;
+                    r = I(:,:,1);
+                    g = I(:,:,2);
+                    b = I(:,:,3);
                     r(obj.mask(obj.crop.yMin:obj.crop.yMax,obj.crop.xMin:obj.crop.xMax)) = 0;
                     g(obj.mask(obj.crop.yMin:obj.crop.yMax,obj.crop.xMin:obj.crop.xMax)) = 0;
                     b(obj.mask(obj.crop.yMin:obj.crop.yMax,obj.crop.xMin:obj.crop.xMax)) = 65535;
