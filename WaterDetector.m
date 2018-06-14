@@ -2,7 +2,8 @@ classdef WaterDetector < handle
     
     properties (Access = private)
         image
-        histeq
+        imageAdapt
+%         histeq
         info
         crop
         mask
@@ -19,7 +20,8 @@ classdef WaterDetector < handle
         %COSTRUCTOR
         function obj = WaterDetector()
             obj.image = [];
-            obj.histeq = false;
+            obj.imageAdapt = [];
+%             obj.histeq = false;
             obj.crop.image = [];
             obj.crop.xMin = 0;
             obj.crop.xMax = 0;
@@ -38,22 +40,13 @@ classdef WaterDetector < handle
         
         %INTERFACE
         function I = getImage(obj)
-            if (obj.histeq)
-                I = obj.image(:,:,1:3);
-            else
-                I(:,:,1) = adapthisteq(obj.image(:,:,1));
-                I(:,:,2) = adapthisteq(obj.image(:,:,2));
-                I(:,:,3) = adapthisteq(obj.image(:,:,3));
-                
-            end
+            I=obj.imageAdapt;
         end
         
         function crop = getCrop(obj)
-            crop = obj.crop;
-            if (~obj.histeq && ~isempty(obj.crop.image))
-                crop.image(:,:,1) = adapthisteq(obj.crop.image(:,:,1));
-                crop.image(:,:,2) = adapthisteq(obj.crop.image(:,:,2));
-                crop.image(:,:,3) = adapthisteq(obj.crop.image(:,:,3));
+           crop = obj.crop;
+            if (~isempty(obj.crop.image))
+                crop.image=obj.imageAdapt(obj.crop.yMin : obj.crop.yMax,obj.crop.xMin : obj.crop.xMax,1:3);
             end
         end
         
@@ -106,13 +99,9 @@ classdef WaterDetector < handle
                 temp = obj.image(:,:,1);
                 obj.image(:,:,1) = obj.image(:,:,3);
                 obj.image(:,:,3) = temp;
-                if (exist('eq','var') && eq)
-                    obj.histeq = true;
-                    obj.image(:,:,1) = adapthisteq(obj.image(:,:,1));
-                    obj.image(:,:,2) = adapthisteq(obj.image(:,:,2));
-                    obj.image(:,:,3) = adapthisteq(obj.image(:,:,3));
-                    obj.image(:,:,4) = adapthisteq(obj.image(:,:,4));
-                end
+                
+                RGB=cat(3,mat2gray(obj.image(:,:,1)),mat2gray(obj.image(:,:,2)),mat2gray(obj.image(:,:,3)));
+                obj.imageAdapt=imadjust(RGB,stretchlim(RGB));
                 obj.info = geotiffinfo(filename);
                 obj.lat = [];
                 obj.lon = [];
@@ -442,7 +431,9 @@ classdef WaterDetector < handle
                 xMax = ((center(2,2)+zoom)<=obj.info.Width)*(center(2,2)+zoom) + ((center(2,2)+zoom)>obj.info.Width)*obj.info.Width;
                 yMin = ((center(2,1)-zoom)>=0)*(center(2,1)-zoom) + ((center(2,1)-zoom)<0)*0;
                 yMax = ((center(1,1)+zoom)<=obj.info.Height)*(center(1,1)+zoom) + ((center(1,1)+zoom)>obj.info.Height)*obj.info.Height;
-                element = obj.image(yMin : yMax,xMin : xMax,1:3);
+                
+                element = obj.imageAdapt(yMin : yMax,xMin : xMax,1:3);
+                
                 area = shapeElement.Area;
             end
         end
@@ -459,7 +450,9 @@ classdef WaterDetector < handle
                 xMax = ((center(2,2)+zoom)<=obj.info.Width)*(center(2,2)+zoom) + ((center(2,2)+zoom)>obj.info.Width)*obj.info.Width;
                 yMin = ((center(2,1)-zoom)>=0)*(center(2,1)-zoom) + ((center(2,1)-zoom)<0)*0;
                 yMax = ((center(1,1)+zoom)<=obj.info.Height)*(center(1,1)+zoom) + ((center(1,1)+zoom)>obj.info.Height)*obj.info.Height;
-                element = obj.image(yMin : yMax,xMin : xMax,1:3);
+                
+                element = obj.imageAdapt(yMin : yMax,xMin : xMax,1:3);
+                
                 area = shapeElement.Area;
             end
         end
